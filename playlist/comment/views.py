@@ -2,25 +2,51 @@ from django.http import HttpResponse
 from django.shortcuts import render
 
 from .models import Comment
-from .utils import fetch_songs
+from .utils import fetch_play, fetch_plays
 
 
 def now_playing(request):
+    """
+    Fetch all the songs played on KEXP in the last 60 minutes and display them
+    along with any comments we have about them in our db.
+    """
     ## First, fetch all the songs KEXP played in the last hour
     try:
-        recently_played = fetch_songs()
+        recent_plays = fetch_plays()
     except Exception as e:
         # log e
         return HttpResponse('Recently played songs could not be fetched', status=400)
 
     ## Then, grab any already existing comments out of the database
     # fetch comments from db in a batch for fewer queries
-    recently_played_ids = [song.playid for song in recently_played]
-    # stick them in a dictionary for easier matching to the songs we've grabbed
-    comments = {c.playid: c for c in Comment.objects.filter(playid__in=recently_played_ids)}
+    recent_play_ids = [play.playid for play in recent_plays]
+    # stick them in a dictionary for easier matching to the plays we've grabbed
+    comments = {c.playid: c for c in Comment.objects.filter(playid__in=recent_play_ids)}
 
-    for song in recently_played:
-        if song.playid in comments:
-            song.comment = comments[song.playid]
+    for play in recent_plays:
+        if play.playid in comments:
+            play.comment = comments[play.playid]
 
-    return HttpResponse(recently_played)
+    return HttpResponse(recent_plays)
+
+
+def last_commented(request):
+    """
+    Fetch the last 20 comments added to plays and display them alongside song
+    data.  This is mostly for testing (since comments on the main page
+    essentially expire after an hour).
+    """
+    comments = Comment.objects.all()
+    plays = []
+
+    for comment in comments[:20]:
+        play = fetch_play(comment.playid)
+
+        if play is None:
+            # log an error
+            continue
+
+        play.comment = comment.comment
+        plays.append(play)
+
+    return HttpResponse(plays)

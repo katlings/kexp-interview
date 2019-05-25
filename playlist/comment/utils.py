@@ -34,7 +34,7 @@ class Play:
         return s
 
 
-def fetch_songs(window=3600):
+def fetch_plays(window=3600):
     """
     Fetch the songs that were played on KEXP in the last [window] seconds
     
@@ -56,3 +56,12 @@ def fetch_songs(window=3600):
         response = requests.get(response['next']).json()  # this will throw KeyError if api response is malformed, but it looks like it always provides a next parameter even if the current response is empty
 
     return songs
+
+
+def fetch_play(playid):
+    response = requests.get(KEXP_API, {'playid': playid}).json()
+
+    if not response.get('results'):
+        return None
+
+    return Play.from_api(response['results'][0])
