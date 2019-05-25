@@ -34,6 +34,7 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
+    'comment.apps.CommentConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -82,7 +83,8 @@ DATABASES = {
         'NAME': 'postgres',
         'USER': 'postgres',
         'PASSWORD': 'pgres',
-        'HOST': 'localhost',
+        'HOST': 'localhost',  # setting this to localhost instead of empty
+                              # forces connection over tcp instead of peer auth
     }
 }
 

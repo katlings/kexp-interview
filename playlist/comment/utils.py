@@ -11,6 +11,7 @@ class Play:
         self.title = title
         self.artist = artist
         self.album = album
+        self.comment = None
 
     @classmethod
     def from_api(cls, playdict):
@@ -27,28 +28,31 @@ class Play:
                    playdict['release']['name'])
     
     def __repr__(self):
-        return f'{self.title} by {self.artist} from {self.album}'
+        s = f'{self.title} by {self.artist} from {self.album}'
+        if self.comment is not None:
+            s = s + f'; {self.comment}'
+        return s
 
 
 def fetch_songs(window=3600):
     """
     Fetch the songs that were played on KEXP in the last [window] seconds
     
-    Return in a simplified format as a list of Play objects
+    Return in a simplified, easy-to-display format as a list of Play objects
     """
 
     def is_song_play(playdict):
+        # not every entry in the playlist is a song; some are e.g. air breaks
         return playdict.get('playtype', {}).get('playtypeid') == 1
 
     utcnow = datetime.datetime.utcnow()
-    songs_since = utcnow - datetime.timedelta(seconds=window)
+    begin_time = utcnow - datetime.timedelta(seconds=window)
 
     songs = []
 
-    # TODO: try/catch
-    response = requests.get(KEXP_API, {'begin_time': songs_since}).json()
+    response = requests.get(KEXP_API, {'begin_time': begin_time}).json()
     while response.get('results'):
         songs.extend(Play.from_api(result) for result in response['results'] if is_song_play(result))
-        response = requests.get(response['next']).json()  # this will throw keyerror if api response is malformed, but it looks like it always provides a next parameter
+        response = requests.get(response['next']).json()  # this will throw KeyError if api response is malformed, but it looks like it always provides a next parameter even if the current response is empty
 
     return songs
