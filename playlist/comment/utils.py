@@ -6,6 +6,9 @@ KEXP_API = 'https://legacy-api.kexp.org/play/'
 
 
 class Play:
+    """
+    A simplified representation of a song play on KEXP
+    """
     def __init__(self, playid, title, artist, album):
         self.playid = playid
         self.title = title

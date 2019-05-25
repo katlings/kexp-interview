@@ -1,3 +1,3 @@
 Django install guide and tutorial: https://docs.djangoproject.com/en/1.11/intro/install/
 Google "postgres on ubuntu": https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-18-04
-A couple of minor lookups via Google from blog posts or stackoverflow: str vs repr, datetime timezones
+A couple of minor lookups via Google from blog posts or stackoverflow: str vs repr, datetime timezones, text box form input type

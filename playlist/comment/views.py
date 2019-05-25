@@ -1,5 +1,6 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
+from django.urls import reverse
 
 from .models import Comment
 from .utils import fetch_play, fetch_plays
@@ -18,7 +19,11 @@ def now_playing(request):
         return HttpResponse('Recently played songs could not be fetched', status=400)
 
     ## Then, grab any already existing comments out of the database
-    # fetch comments from db in a batch for fewer queries
+
+    # it would be conceptually simpler to go through each play in the list and
+    # check for a comment, but that means we'd do multiple db queries per page
+    # load, which is suboptimal in terms of load time. instead we'll batch the
+    # query to grab all relevant comments and sort them out later.
     recent_play_ids = [play.playid for play in recent_plays]
     # stick them in a dictionary for easier matching to the plays we've grabbed
     comments = {c.playid: c for c in Comment.objects.filter(playid__in=recent_play_ids)}
@@ -27,13 +32,22 @@ def now_playing(request):
         if play.playid in comments:
             play.comment = comments[play.playid]
 
-    return HttpResponse(recent_plays)
+    return render(request,
+                  'comment/now_playing.html',
+                  {'recent_plays': recent_plays})
+
+
+def add_comment(request, playid):
+    comment, _ = Comment.objects.get_or_create(playid=playid)
+    comment.comment = request.POST['comment']
+    comment.save()
+    return HttpResponseRedirect(reverse('comment:now_playing'))
 
 
 def last_commented(request):
     """
     Fetch the last 20 comments added to plays and display them alongside song
-    data.  This is mostly for testing (since comments on the main page
+    data. This is mostly for testing (since comments on the main page
     essentially expire after an hour).
     """
     comments = Comment.objects.all()

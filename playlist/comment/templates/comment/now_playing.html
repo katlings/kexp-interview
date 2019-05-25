@@ -1,0 +1,48 @@
+{% if recent_plays %}
+    <table>
+        <tr>
+            <td>
+                <h4>Title</h4>
+            </td>
+            <td>
+                <h4>Artist</h4>
+            </td>
+            <td>
+                <h4>Album</h4>
+            </td>
+            <td>
+                <h4>Comment</h4>
+            </td>
+        </tr>
+        {% for play in recent_plays %}
+            <tr>
+                <td>
+                    {{ play.title }}
+                </td>
+                <td>
+                    {{ play.artist }}
+                </td>
+                <td>
+                    {{ play.album }}
+                </td>
+                <td>
+                    {% if play.comment %}
+                        <form action="{% url 'comment:add_comment' play.playid %}" method="post">
+                            {% csrf_token %}
+                            <input type="text" name="comment" value="{{ play.comment }}">
+                            <input type="submit" value="Edit">
+                        </form>
+                    {% else %}
+                        <form action="{% url 'comment:add_comment' play.playid %}" method="post">
+                            {% csrf_token %}
+                            <input type="text" name="comment" value="">
+                            <input type="submit" value="Add">
+                        </form>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% else %}
+    <p>No recently played songs found.</p>
+{% endif %}
