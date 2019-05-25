@@ -25,7 +25,10 @@ SECRET_KEY = '3@l-n73ikq%blvadj_fmf$m+ky#z53xy+yeac5wjnk=3j$$l5r'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'abscissa',
+    '192.168.1.222',
+]
 
 
 # Application definition
@@ -75,8 +78,11 @@ WSGI_APPLICATION = 'playlist.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'pgres',
+        'HOST': 'localhost',
     }
 }
 
