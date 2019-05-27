@@ -1,56 +1,61 @@
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
+{% load tz %}
+
+<div class="container">
+    <div class="row">
+        <h3>Recently played on KEXP</h3>
+    </div>
 {% if recent_plays %}
-    <table>
-        <tr>
-            <td>
-                <h4>Time</h4>
-            </td>
-            <td>
-                <h4>Title</h4>
-            </td>
-            <td>
-                <h4>Artist</h4>
-            </td>
-            <td>
-                <h4>Album</h4>
-            </td>
-            <td>
-                <h4>Comment</h4>
-            </td>
-        </tr>
-        {% for play in recent_plays %}
-            <tr>
-                <td>
-                    {{ play.airdate }}
-                </td>
-                <td>
-                    {{ play.title }}
-                </td>
-                <td>
-                    {{ play.artist }}
-                </td>
-                <td>
-                    {{ play.album }}
-                </td>
-                <td>
+    <div class="row">
+        <div class="col">
+            <h5>Time</h5>
+        </div>
+        <div class="col">
+            <h5>Title</h5>
+        </div>
+        <div class="col">
+            <h5>Artist</h5>
+        </div>
+        <div class="col">
+            <h5>Album</h5>
+        </div>
+    </div>
+    {% for play in recent_plays %}
+        <div class="row">
+            <div class="col">
+                {{ play.airdate|localtime }}
+            </div>
+            <div class="col">
+                {{ play.title }}
+            </div>
+            <div class="col">
+                {{ play.artist }}
+            </div>
+            <div class="col">
+                {{ play.album }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-1">
+            </div>
+            <div class="col">
+                <form action="{% url 'comment:add_comment' play.playid %}" method="post">
+                    Comment:
+                    {% csrf_token %}
                     {% if play.comment %}
-                        <form action="{% url 'comment:add_comment' play.playid %}" method="post">
-                            {% csrf_token %}
-                            <input type="text" name="comment" value="{{ play.comment }}">
-                            <input type="submit" value="Edit">
-                        </form>
+                        {{ play.comment }}
+                        <input type="submit" value="Edit">
                     {% else %}
-                        <form action="{% url 'comment:add_comment' play.playid %}" method="post">
-                            {% csrf_token %}
-                            <input type="text" name="comment" value="">
-                            <input type="submit" value="Add">
-                        </form>
+                        <input type="text" name="comment" value="">
+                        <input type="submit" value="Add">
                     {% endif %}
-                </td>
-            </tr>
+                </form>
+            </div>
+        </div>
         {% endfor %}
     </table>
 {% else %}
     <p>No recently played songs found.</p>
 {% endif %}
+</div>
