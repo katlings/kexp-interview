@@ -1,6 +1,11 @@
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
 {% if recent_plays %}
     <table>
         <tr>
+            <td>
+                <h4>Time</h4>
+            </td>
             <td>
                 <h4>Title</h4>
             </td>
@@ -16,6 +21,9 @@
         </tr>
         {% for play in recent_plays %}
             <tr>
+                <td>
+                    {{ play.airdate }}
+                </td>
                 <td>
                     {{ play.title }}
                 </td>
@@ -46,6 +54,3 @@
 {% else %}
     <p>No recently played songs found.</p>
 {% endif %}
-
-
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">

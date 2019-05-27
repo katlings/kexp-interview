@@ -1,9 +1,14 @@
+import logging
+
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
 from .models import Comment
 from .utils import fetch_play, fetch_plays
+
+
+log = logging.getLogger(__name__)
 
 
 def now_playing(request):
@@ -15,7 +20,7 @@ def now_playing(request):
     try:
         recent_plays = fetch_plays()
     except Exception as e:
-        # log e
+        log.exception('Failed to fetch plays from KEXP API')
         return HttpResponse('Recently played songs could not be fetched', status=400)
 
     ## Then, grab any already existing comments out of the database

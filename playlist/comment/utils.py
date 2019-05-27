@@ -1,7 +1,9 @@
 import datetime
+import logging
 import requests
 
 
+log = logging.getLogger(__name__)
 KEXP_API = 'https://legacy-api.kexp.org/play/'
 
 
@@ -23,14 +25,25 @@ class Play:
         Create a Play object directly from the format returned by the KEXP
         API
         """
-        if not playdict['playtype']['playtypeid'] == 1:
+        def get_from_api_dict(key1, key2='name'):
+            """
+            Sometimes a play won't have e.g. a release/album associated with
+            it; we want to be able to safely get the value out if it exists, or
+            return None if it doesn't.
+            """
+            if playdict.get(key1) is not None:
+                return playdict.get(key1).get(key2)
+            else:
+                return None
+
+        if not playdict.get('playtype', {}).get('playtypeid') == 1:
             return None
 
-        return cls(playdict['playid'],
-                   playdict['track']['name'],
-                   playdict['artist']['name'],
-                   playdict['release']['name'],
-                   playdict['airdate'])
+        return cls(playdict.get('playid'),
+                   get_from_api_dict('track'),
+                   get_from_api_dict('artist'),
+                   get_from_api_dict('release'),
+                   playdict.get('airdate'))
     
     def __repr__(self):
         s = f'{self.title} by {self.artist} from {self.album}'
@@ -43,7 +56,9 @@ class Play:
         Detect when two plays are of the same song, even if they don't have the
         same playid
         """
-        return self.title == other.title and self.artist == other.artist and self.album == other.album
+        return (self.title == other.title and
+                self.artist == other.artist and
+                self.album == other.album)
 
 
 def fetch_plays(window=3600, end_time=None):
@@ -67,8 +82,11 @@ def fetch_plays(window=3600, end_time=None):
 
     response = requests.get(KEXP_API, {'begin_time': begin_time, 'end_time': end_time}).json()
     while response.get('results'):
-        plays.extend(Play.from_api(result) for result in response['results'] if is_song_play(result))
-        response = requests.get(response['next']).json()  # this will throw KeyError if api response is malformed, but it looks like it always provides a next parameter even if the current response is empty
+        plays.extend(Play.from_api(result) for result in response['results'] if result is not None and is_song_play(result))
+        # this will throw KeyError if api response is malformed, but it looks
+        # like it always provides a next parameter even if the current
+        # response is empty
+        response = requests.get(response['next']).json()
 
     # sometimes a song will be reported twice from the API with two different
     # playids; it looks like this occurs when a comment is added to the play on
@@ -83,11 +101,15 @@ def fetch_plays(window=3600, end_time=None):
 
     for play in plays:
         # if it's not already in the unique list, add it
-        # this isn't the most efficient algorithm (O(n^2)), but it's
+        # this isn't the most efficient algorithm (it's O(n^2)), but it's
         # conceptually simple and we're only dealing with ~20 plays in any
         # given hour so it's still a trivial amount of work
         if not any(play.duplicate(other) for other in unique_plays):
             unique_plays.append(play)
+
+    # it's more intuitive to display the most recently played song first, so
+    # reverse the order
+    unique_plays.reverse()
 
     return unique_plays
 
