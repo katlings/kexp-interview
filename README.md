@@ -7,7 +7,7 @@ comments to be added, edited, and stored.
 
 Comments are stored in a Postgres database; the credentials are set to the
 default `postgres` database (under user `postgres`) running on `localhost` and
-can be edited in [settings.py](../blob/master/playlist/settings.py). Database
+can be edited in [settings.py](../master/playlist/playlist/settings.py). Database
 setup is as follows:
 
 1. Create the database. If using the default `postgres` database, this will be
@@ -20,7 +20,7 @@ setup is as follows:
    A [virtualenv](https://virtualenv.pypa.io/en/latest/) is handy.
 
 3. Run Django migrations; this will create the table setup. From the
-   [playlist](../blob/master/playlist/) folder, run
+   [playlist](../master/playlist/) folder, run
    ```
    python manage.py migrate
    ```
@@ -31,6 +31,6 @@ Once the database is set up, the Django webapp can be run locally with
 ```
 python manage.py runserver
 ```
-from the [playlist](../blob/master/playlist/) folder. By default, it will
+from the [playlist](../master/playlist/) folder. By default, it will
 run on `localhost` on port `8000`. The playlist comment feature is mapped to
 `http://localhost:8000/playlist/`.
