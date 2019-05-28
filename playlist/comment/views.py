@@ -25,9 +25,9 @@ def now_playing(request):
 
     ## Then, grab any already existing comments out of the database
 
-    # it would be conceptually simpler to go through each play in the list and
+    # It would be conceptually simpler to go through each play in the list and
     # check for a comment, but that means we'd do multiple db queries per page
-    # load, which is suboptimal in terms of load time. instead we'll batch the
+    # load, which is suboptimal in terms of load time. Instead we'll batch the
     # query to grab all relevant comments and sort them out later.
     recent_play_ids = [play.playid for play in recent_plays]
     # stick them in a dictionary for easier matching to the plays we've grabbed
@@ -62,7 +62,7 @@ def last_commented(request):
         play = fetch_play(comment.playid)
 
         if play is None:
-            # log an error
+            log.error(f'No data found for playid {comment.playid}')
             continue
 
         play.comment = comment.comment

@@ -48,6 +48,7 @@
             </tr>
             <tr>
                 <td colspan="4" class="px-5">
+                <!-- the tricky part: a hidden form. We'll use bootstrap to expand it when a toggle button is clicked, and include a cancel button to unexpand it and display the toggle button again -->
                 <div class="collapse" id="commentForm{{play.playid}}">
                     <form action="{% url 'comment:add_comment' play.playid %}" method="post">
                         {% csrf_token %}
@@ -57,21 +58,22 @@
                             <textarea class="form-control" id="commentField{{play.playid}}" name="comment" rows="3">{% if play.comment %}{{ play.comment }}{% endif %}</textarea>
                         </div>
                         {% if play.comment %}
-                            <button type="submit" class="btn btn-secondary btn-sm">Edit Comment</button>
-                            <button type="button" class="btn btn-secondary btn-sm" data-toggle="collapse" data-target="#commentForm{{play.playid}}" onclick="$('#buttonDiv{{play.playid}}').show()">Cancel</button>
+                            <button type="submit" class="btn btn-secondary">Edit Comment</button>
+                            <button type="button" class="btn btn-secondary" data-toggle="collapse" data-target="#commentForm{{play.playid}}" onclick="$('#buttonDiv{{play.playid}}').show()">Cancel</button>
                         {% else %}
-                            <button type="submit" class="btn btn-primary btn-sm">Add Comment</button>
-                            <button type="button" class="btn btn-primary btn-sm" data-toggle="collapse" data-target="#commentForm{{play.playid}}" onclick="$('#buttonDiv{{play.playid}}').show()">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Add Comment</button>
+                            <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#commentForm{{play.playid}}" onclick="$('#buttonDiv{{play.playid}}').show()">Cancel</button>
                         {% endif %}
                     </form>
                 </div>
+                <!-- display the comment if it exists and a button to toggle the form; hide this section if the form is toggled -->
                 <div id="buttonDiv{{play.playid}}">
                     {% if play.comment %}
                         <p><em>Comment:</em></p>
                         <p>{{ play.comment }}</p>
-                        <button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="collapse" data-target="#commentForm{{play.playid}}" onclick="$(this).parent().hide()">Edit Comment</button>
+                        <button type="button" class="btn btn-outline-secondary" data-toggle="collapse" data-target="#commentForm{{play.playid}}" onclick="$(this).parent().hide()">Edit Comment</button>
                     {% else %}
-                        <button type="button" class="btn btn-outline-primary btn-sm" data-toggle="collapse" data-target="#commentForm{{play.playid}}" onclick="$(this).parent().hide()">Add Comment</button>
+                        <button type="button" class="btn btn-outline-primary" data-toggle="collapse" data-target="#commentForm{{play.playid}}" onclick="$(this).parent().hide()">Add Comment</button>
                     {% endif %}
                 </div>
                 </td>
@@ -87,7 +89,7 @@
 {% endif %}
 </div>
 
-<!-- bootstrap javascript -->
+<!-- bootstrap javascript and requirements (including jquery!) -->
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
