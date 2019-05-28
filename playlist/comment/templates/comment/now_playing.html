@@ -1,6 +1,6 @@
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-
 {% load tz %}
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
 <div class="container">
     <div class="row my-4">
@@ -48,26 +48,36 @@
             <tr>
                 <td colspan="4" class="px-5">
                 {% if play.comment %}
-                    <p>
-                    <em>Comment:</em> {{ play.comment }}
-                    </p>
-                    <button type="button" class="btn btn-outline-secondary" name="edit-comment">Edit Comment</button>
+                <div class="collapse" id="editCommentForm{{play.playid}}">
+                    <form action="{% url 'comment:add_comment' play.playid %}" method="post">
+                        {% csrf_token %}
+                    
+                        <div class="form-group">
+                            <label for="editCommentField">Comment:</label>
+                            <textarea class="form-control" name="comment" rows="3">{{ play.comment }}</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-secondary">Edit Comment</button>
+                    </form>
+                </div>
+                <div id="commentDiv{{play.playid}}">
+                    <p><em>Comment:</em></p>
+                    <p>{{ play.comment }}</p>
+                    <button type="button" class="btn btn-outline-secondary" data-toggle="collapse" data-target="#editCommentForm{{play.playid}}" onclick="$(this).parent().hide()">Edit Comment</button>
+                </div>
                 {% else %}
-                    <button type="button" class="btn btn-outline-primary" name="add-comment">Add Comment</button>
+                    <div class="collapse" id="addCommentForm{{play.playid}}">
+                        <form action="{% url 'comment:add_comment' play.playid %}" method="post">
+                            {% csrf_token %}
+                        
+                            <div class="form-group">
+                                <label for="addCommentField">Comment:</label>
+                                <textarea class="form-control" name="comment" id="addCommentField{{play.playid}}" rows="3"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Add Comment</button>
+                        </form>
+                    </div>
+                    <button type="button" class="btn btn-outline-primary hide-on-toggle" data-toggle="collapse" data-target="#addCommentForm{{play.playid}}" onclick="$(this).hide()">Add Comment</button>
                 {% endif %}
-                <!----------
-                <form action="{% url 'comment:add_comment' play.playid %}" method="post">
-                    Comment:
-                    {% csrf_token %}
-                    {% if play.comment %}
-                        {{ play.comment }}
-                        <input type="submit" value="Edit">
-                    {% else %}
-                        <input type="text" name="comment" value="">
-                        <input type="submit" value="Add">
-                    {% endif %}
-                </form>
-                ---------->
                 </td>
             </tr>
         {% endfor %}
@@ -80,3 +90,8 @@
     <p>No recently played songs found.</p>
 {% endif %}
 </div>
+
+<!-- bootstrap javascript -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
