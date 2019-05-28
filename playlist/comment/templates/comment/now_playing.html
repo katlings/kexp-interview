@@ -1,5 +1,6 @@
 {% load tz %}
 
+<title>Recently Played on KEXP</title>
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
 <div class="container">
@@ -47,37 +48,32 @@
             </tr>
             <tr>
                 <td colspan="4" class="px-5">
-                {% if play.comment %}
-                <div class="collapse" id="editCommentForm{{play.playid}}">
+                <div class="collapse" id="commentForm{{play.playid}}">
                     <form action="{% url 'comment:add_comment' play.playid %}" method="post">
                         {% csrf_token %}
                     
                         <div class="form-group">
-                            <label for="editCommentField">Comment:</label>
-                            <textarea class="form-control" name="comment" rows="3">{{ play.comment }}</textarea>
+                            <label for="commentField{{play.playid}}">Comment:</label>
+                            <textarea class="form-control" id="commentField{{play.playid}}" name="comment" rows="3">{% if play.comment %}{{ play.comment }}{% endif %}</textarea>
                         </div>
-                        <button type="submit" class="btn btn-secondary">Edit Comment</button>
+                        {% if play.comment %}
+                            <button type="submit" class="btn btn-secondary btn-sm">Edit Comment</button>
+                            <button type="button" class="btn btn-secondary btn-sm" data-toggle="collapse" data-target="#commentForm{{play.playid}}" onclick="$('#buttonDiv{{play.playid}}').show()">Cancel</button>
+                        {% else %}
+                            <button type="submit" class="btn btn-primary btn-sm">Add Comment</button>
+                            <button type="button" class="btn btn-primary btn-sm" data-toggle="collapse" data-target="#commentForm{{play.playid}}" onclick="$('#buttonDiv{{play.playid}}').show()">Cancel</button>
+                        {% endif %}
                     </form>
                 </div>
-                <div id="commentDiv{{play.playid}}">
-                    <p><em>Comment:</em></p>
-                    <p>{{ play.comment }}</p>
-                    <button type="button" class="btn btn-outline-secondary" data-toggle="collapse" data-target="#editCommentForm{{play.playid}}" onclick="$(this).parent().hide()">Edit Comment</button>
+                <div id="buttonDiv{{play.playid}}">
+                    {% if play.comment %}
+                        <p><em>Comment:</em></p>
+                        <p>{{ play.comment }}</p>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="collapse" data-target="#commentForm{{play.playid}}" onclick="$(this).parent().hide()">Edit Comment</button>
+                    {% else %}
+                        <button type="button" class="btn btn-outline-primary btn-sm" data-toggle="collapse" data-target="#commentForm{{play.playid}}" onclick="$(this).parent().hide()">Add Comment</button>
+                    {% endif %}
                 </div>
-                {% else %}
-                    <div class="collapse" id="addCommentForm{{play.playid}}">
-                        <form action="{% url 'comment:add_comment' play.playid %}" method="post">
-                            {% csrf_token %}
-                        
-                            <div class="form-group">
-                                <label for="addCommentField">Comment:</label>
-                                <textarea class="form-control" name="comment" id="addCommentField{{play.playid}}" rows="3"></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Add Comment</button>
-                        </form>
-                    </div>
-                    <button type="button" class="btn btn-outline-primary hide-on-toggle" data-toggle="collapse" data-target="#addCommentForm{{play.playid}}" onclick="$(this).hide()">Add Comment</button>
-                {% endif %}
                 </td>
             </tr>
         {% endfor %}
