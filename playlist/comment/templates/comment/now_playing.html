@@ -3,43 +3,59 @@
 {% load tz %}
 
 <div class="container">
-    <div class="row">
+    <div class="row my-4">
         <h3>Recently played on KEXP</h3>
     </div>
 {% if recent_plays %}
     <div class="row">
-        <div class="col">
-            <h5>Time</h5>
-        </div>
-        <div class="col">
-            <h5>Title</h5>
-        </div>
-        <div class="col">
-            <h5>Artist</h5>
-        </div>
-        <div class="col">
-            <h5>Album</h5>
-        </div>
-    </div>
-    {% for play in recent_plays %}
-        <div class="row">
-            <div class="col">
-                {{ play.airdate|localtime }}
-            </div>
-            <div class="col">
-                {{ play.title }}
-            </div>
-            <div class="col">
-                {{ play.artist }}
-            </div>
-            <div class="col">
-                {{ play.album }}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-1">
-            </div>
-            <div class="col">
+        <div class="card">
+        <div class="table">
+        <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">
+                    Time
+                </th>
+                <th scope="col">
+                    Title
+                </th>
+                <th scope="col">
+                    Artist
+                </th>
+                <th scope="col">
+                    Album
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for play in recent_plays %}
+            <tr>
+                <td>
+                    {% timezone "America/Los_Angeles" %}
+                        {{ play.airdate }}
+                    {% endtimezone %}
+                </td>
+                <td>
+                    {{ play.title }}
+                </td>
+                <td>
+                    {{ play.artist }}
+                </td>
+                <td>
+                    {{ play.album }}
+                </td>
+            </tr>
+            <tr>
+                <td colspan="4" class="px-5">
+                {% if play.comment %}
+                    <p>
+                    <em>Comment:</em> {{ play.comment }}
+                    </p>
+                    <button type="button" class="btn btn-outline-secondary" name="edit-comment">Edit Comment</button>
+                {% else %}
+                    <button type="button" class="btn btn-outline-primary" name="add-comment">Add Comment</button>
+                {% endif %}
+                <!----------
                 <form action="{% url 'comment:add_comment' play.playid %}" method="post">
                     Comment:
                     {% csrf_token %}
@@ -51,10 +67,15 @@
                         <input type="submit" value="Add">
                     {% endif %}
                 </form>
-            </div>
-        </div>
+                ---------->
+                </td>
+            </tr>
         {% endfor %}
-    </table>
+        </tbody>
+        </table>
+        </div> <!-- table -->
+        </div> <!-- card -->
+    </div> <!-- row -->
 {% else %}
     <p>No recently played songs found.</p>
 {% endif %}

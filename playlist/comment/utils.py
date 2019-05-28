@@ -1,5 +1,6 @@
 import datetime
 import logging
+import pytz
 import requests
 
 
@@ -9,14 +10,15 @@ KEXP_API = 'https://legacy-api.kexp.org/play/'
 
 class Play:
     """
-    A simplified representation of a song play on KEXP
+    A simplified representation of a song play on KEXP, containing all the data
+    necessary to display and store it
     """
     def __init__(self, playid, title, artist, album, airdatestr):
         self.playid = playid
         self.title = title
         self.artist = artist
         self.album = album
-        self.airdate = datetime.datetime.strptime(airdatestr, '%Y-%m-%dT%H:%M:%SZ')
+        self.airdate = datetime.datetime.strptime(airdatestr, '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=pytz.UTC)
         self.comment = None
 
     @classmethod
@@ -36,7 +38,7 @@ class Play:
             else:
                 return None
 
-        if not playdict.get('playtype', {}).get('playtypeid') == 1:
+        if not get_from_api_dict('playtype', 'playtypeid') == 1:
             return None
 
         return cls(playdict.get('playid'),
@@ -89,8 +91,8 @@ def fetch_plays(window=3600, end_time=None):
         response = requests.get(response['next']).json()
 
     # sometimes a song will be reported twice from the API with two different
-    # playids; it looks like this occurs when a comment is added to the play on
-    # the KEXP side (not via this webapp ;) )
+    # playids; it looks like this can occur when a comment is added to the play
+    # on the KEXP side (not via this webapp ;) )
     # to avoid double-listing songs when this happens, we're going to look through
     # the list and only keep the lowest playid out of any duplicates.
 
