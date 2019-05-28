@@ -26,6 +26,8 @@ SECRET_KEY = '3@l-n73ikq%blvadj_fmf$m+ky#z53xy+yeac5wjnk=3j$$l5r'
 DEBUG = True
 
 ALLOWED_HOSTS = [
+    # For personal use, to make the website accessible from other
+    # computers on my home network
     'abscissa',
     '192.168.1.222',
 ]
@@ -85,6 +87,7 @@ DATABASES = {
         'PASSWORD': 'pgres',
         'HOST': 'localhost',  # setting this to localhost instead of empty
                               # forces connection over tcp instead of peer auth
+        'PORT': 5432,
     }
 }
 
