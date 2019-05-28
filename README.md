@@ -13,9 +13,14 @@ setup is as follows:
 1. Create the database. If using the default `postgres` database, this will be
    done when installing postgres.
 
-2. Run Django migrations; this will create the table setup. From the
-   [playlist](../blob/master/playlist/) folder, run
+2. Install Python dependencies with
+   ```
+   pip install -r requirements.txt
+   ```
+   A [virtualenv](https://virtualenv.pypa.io/en/latest/) is handy.
 
+3. Run Django migrations; this will create the table setup. From the
+   [playlist](../blob/master/playlist/) folder, run
    ```
    python manage.py migrate
    ```
@@ -23,11 +28,9 @@ setup is as follows:
 ## Webapp
 
 Once the database is set up, the Django webapp can be run locally with
-
 ```
 python manage.py runserver
 ```
-
-By default, it will run on localhost at port 8000. The playlist comment
-feature is mapped to `http://localhost:8000/playlist/`.
-
+from the [playlist](../blob/master/playlist/) folder. By default, it will
+run on `localhost` on port `8000`. The playlist comment feature is mapped to
+`http://localhost:8000/playlist/`.
