@@ -34,3 +34,11 @@ python manage.py runserver
 from the [playlist](../master/playlist/) folder. By default, it will
 run on `localhost` on port `8000`. The playlist comment feature is mapped to
 `http://localhost:8000/playlist/`.
+
+## Testing
+
+Again, once the database is set up, tests can be run with
+```
+python manage.py test
+```
+from the [playlist](../master/playlist/) folder.

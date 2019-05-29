@@ -94,8 +94,12 @@ class PlaylistViewTests(TestCase):
         comment.save()
 
         play = Play(42, 'Ticket to Ride', 'The Beatles', 'Help!', '2019-05-28T11:11:11Z')
+        self.assertIs(play.comment, None)
 
         plays_with_comments = add_comments_from_db([play])
+
+        # this object got modified in place
+        self.assertEqual(play.comment, comment_text)
         self.assertIs(len(plays_with_comments), 1)
         self.assertEqual(plays_with_comments[0].comment, comment_text)
 
@@ -117,11 +121,11 @@ class PlaylistViewTests(TestCase):
                  Play(50, 'Fire Drills', 'Dessa', 'Chime', '2019-05-28T11:15:11Z'),
                  Play(55, 'Vicious', 'Halestorm', 'Vicious', '2019-05-28T11:19:11Z'),
                 ]
-        self.assertIs(None, plays[0].comment)
+        self.assertIs(plays[0].comment, None)
 
         plays_with_comments = add_comments_from_db(plays)
 
         self.assertIs(len(plays_with_comments), 3)
-        self.assertEqual(comment_text, plays_with_comments[0].comment)
-        self.assertIs(None, plays_with_comments[1].comment)
-        self.assertEqual(comment_text2, plays_with_comments[2].comment)
+        self.assertEqual(plays_with_comments[0].comment, comment_text)
+        self.assertIs(plays_with_comments[1].comment, None)
+        self.assertEqual(plays_with_comments[2].comment, comment_text2)
