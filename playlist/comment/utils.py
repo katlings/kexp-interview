@@ -3,6 +3,8 @@ import logging
 import pytz
 import requests
 
+from .models import Comment
+
 
 log = logging.getLogger(__name__)
 KEXP_API = 'https://legacy-api.kexp.org/play/'
@@ -63,22 +65,14 @@ class Play:
                 self.album == other.album)
 
 
-def fetch_plays(window=3600, end_time=None):
+def fetch_plays_from_api(begin_time, end_time):
     """
-    Fetch the songs that were played on KEXP in the [window] seconds before
-    [end_time]. end_time is a timezone-naive datetime object expressing the
-    time in UTC, and defaults to the current time.
-    
-    Return a simplified, easy-to-display format as a list of Play objects
+    The heavy lifting; actually call the KEXP API and parse the response
+    into simplified Play objects
     """
-
     def is_song_play(playdict):
         # not every entry in the playlist is a song; some are e.g. air breaks
         return playdict.get('playtype', {}).get('playtypeid') == 1
-
-    if end_time is None:
-        end_time = datetime.datetime.utcnow()
-    begin_time = end_time - datetime.timedelta(seconds=window)
 
     plays = []
 
@@ -89,6 +83,24 @@ def fetch_plays(window=3600, end_time=None):
         # like it always provides a next parameter even if the current
         # response is empty
         response = requests.get(response['next']).json()
+
+    return plays
+
+
+def fetch_plays(window=3600, end_time=None):
+    """
+    Fetch the songs that were played on KEXP in the [window] seconds before
+    [end_time]. end_time is a timezone-naive datetime object expressing the
+    time in UTC, and defaults to the current time.
+
+    Return a simplified, easy-to-display format as a list of Play objects
+    """
+
+    if end_time is None:
+        end_time = datetime.datetime.utcnow()
+    begin_time = end_time - datetime.timedelta(seconds=window)
+
+    plays = fetch_plays_from_api(begin_time, end_time)
 
     # sometimes a song will be reported twice from the API with two different
     # playids; it looks like this can occur when a comment is added to the play
@@ -116,10 +128,23 @@ def fetch_plays(window=3600, end_time=None):
     return unique_plays
 
 
-def fetch_play(playid):
-    response = requests.get(KEXP_API, {'playid': playid}).json()
+def add_comments_from_db(plays):
+    """
+    Fetch comments in one batch from the database for a given set of Play objects,
+    and add them to the Play objects.
+    NOTE: This modifies the original objects in the plays list. We return the
+    list at the end for flexibility, but the list is modified over the course of
+    the function; side effects are happening!
+    """
+    play_ids = [play.playid for play in plays]
+    # Fetch comments from db and stick them in a dictionary for easier matching
+    # to the relevant set of plays
+    comments = {c.playid: c for c in Comment.objects.filter(playid__in=play_ids)}
 
-    if not response.get('results'):
-        return None
+    for play in plays:
+        if play.playid in comments:
+            play.comment = comments[play.playid].comment
+        else:
+            play.comment = None
 
-    return Play.from_api(response['results'][0])
+    return plays

@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from .models import Comment
-from .utils import fetch_play, fetch_plays
+from .utils import add_comments_from_db, fetch_plays
 
 
 log = logging.getLogger(__name__)
@@ -25,17 +25,12 @@ def now_playing(request):
 
     ## Then, grab any already existing comments out of the database
 
-    # It would be conceptually simpler to go through each play in the list and
-    # check for a comment, but that means we'd do multiple db queries per page
-    # load, which is suboptimal in terms of load time. Instead we'll batch the
-    # query to grab all relevant comments and sort them out later.
-    recent_play_ids = [play.playid for play in recent_plays]
-    # stick them in a dictionary for easier matching to the plays we've grabbed
-    comments = {c.playid: c for c in Comment.objects.filter(playid__in=recent_play_ids)}
-
-    for play in recent_plays:
-        if play.playid in comments:
-            play.comment = comments[play.playid]
+    # It would be conceptually simple to go through each play in the list and
+    # check for a comment in the database, but that means we'd do multiple db
+    # queries per page load, which is suboptimal in terms of load time. Instead
+    # we'll batch the query to grab all relevant comments and sort them out in
+    # a helper function.
+    recent_plays = add_comments_from_db(recent_plays)
 
     return render(request,
                   'comment/now_playing.html',
@@ -47,25 +42,3 @@ def add_comment(request, playid):
     comment.comment = request.POST['comment']
     comment.save()
     return HttpResponseRedirect(reverse('comment:now_playing'))
-
-
-def last_commented(request):
-    """
-    Fetch the last 20 comments added to plays and display them alongside song
-    data. This is mostly for testing (since comments on the main page
-    essentially expire after an hour).
-    """
-    comments = Comment.objects.all()
-    plays = []
-
-    for comment in comments[:20]:
-        play = fetch_play(comment.playid)
-
-        if play is None:
-            log.error(f'No data found for playid {comment.playid}')
-            continue
-
-        play.comment = comment.comment
-        plays.append(play)
-
-    return HttpResponse(plays)

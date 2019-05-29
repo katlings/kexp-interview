@@ -13,7 +13,7 @@ class Comment(models.Model):
     # playing a song; this makes sense because comments could be time-sensitive
     # (e.g. 'This band is coming to Seattle tomorrow'). It's out of scope for
     # this interview project, but it would be cool to store the trackid (and/or
-    # artistid!) to save someone some work by pre-populating previous comments
+    # artistid!) to save a user some work by pre-populating previous comments
     # left on the same song or other songs by the same artist.
     playid = models.IntegerField(unique=True)
     comment = models.CharField(max_length=2048)

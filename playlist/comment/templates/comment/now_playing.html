@@ -55,9 +55,9 @@
                     
                         <div class="form-group">
                             <label for="commentField{{play.playid}}">Comment:</label>
-                            <textarea class="form-control" id="commentField{{play.playid}}" name="comment" rows="3">{% if play.comment %}{{ play.comment }}{% endif %}</textarea>
+                            <textarea class="form-control" id="commentField{{play.playid}}" name="comment" rows="3">{% if play.comment is not None %}{{ play.comment }}{% endif %}</textarea>
                         </div>
-                        {% if play.comment %}
+                        {% if play.comment is not None %}
                             <button type="submit" class="btn btn-secondary">Edit Comment</button>
                             <button type="button" class="btn btn-secondary" data-toggle="collapse" data-target="#commentForm{{play.playid}}" onclick="$('#buttonDiv{{play.playid}}').show()">Cancel</button>
                         {% else %}
@@ -68,7 +68,7 @@
                 </div>
                 <!-- display the comment if it exists and a button to toggle the form; hide this section if the form is toggled -->
                 <div id="buttonDiv{{play.playid}}">
-                    {% if play.comment %}
+                    {% if play.comment is not None %}
                         <p><em>Comment:</em></p>
                         <p>{{ play.comment }}</p>
                         <button type="button" class="btn btn-outline-secondary" data-toggle="collapse" data-target="#commentForm{{play.playid}}" onclick="$(this).parent().hide()">Edit Comment</button>
