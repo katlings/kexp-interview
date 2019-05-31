@@ -3,6 +3,16 @@
 A webapp to display the tracks played on KEXP in the last hour, and allow
 comments to be added, edited, and stored.
 
+## Requirements
+
+Tested with:
+```
+Ubuntu 16.04, 18.04
+Postgres 9.5, 10.8
+Python 3.6.8
+Django 1.11
+```
+
 ## Postgres Database Setup
 
 Comments are stored in a Postgres database; the credentials are set to the
@@ -11,7 +21,18 @@ can be edited in [settings.py](../master/playlist/playlist/settings.py). Databas
 setup is as follows:
 
 1. Create the database. If using the default `postgres` database, this will be
-   done when installing postgres.
+   done when installing postgres. On Ubuntu, install with
+   ```
+   sudo apt install postgresql postgresql-server-dev-all
+   ```
+   To use TCP authentication instead of messing around with Unix users, the
+   default uname on Postgres needs a password.
+   ```
+   $ sudo -u postgres psql
+   postgres=# ALTER USER postgres PASSWORD 'pgres';
+   ALTER ROLE
+   postgres=# \q
+   ```
 
 2. Install Python dependencies with
    ```

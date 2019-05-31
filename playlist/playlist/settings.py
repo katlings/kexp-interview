@@ -30,6 +30,8 @@ ALLOWED_HOSTS = [
     # computers on my home network
     'abscissa',
     '192.168.1.222',
+    'localhost',
+    '127.0.0.1',
 ]
 
 
