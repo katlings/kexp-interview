@@ -33,7 +33,8 @@ class Play:
             """
             Sometimes a play won't have e.g. a release/album associated with
             it; we want to be able to safely get the value out if it exists, or
-            return None if it doesn't.
+            return None if it doesn't. We can't do this directly with get
+            because the key exists and its value is None.
             """
             if playdict.get(key1) is not None:
                 return playdict.get(key1).get(key2)
@@ -67,8 +68,9 @@ class Play:
 
 def fetch_plays_from_api(begin_time, end_time):
     """
-    The heavy lifting; actually call the KEXP API and parse the response
-    into simplified Play objects
+    The heavy lifting; actually call the KEXP API for recent plays between
+    [begin_time] and [end_time] (both timezone-naive datetime objects in UTC)
+    and parse the response into simplified Play objects
     """
     def is_song_play(playdict):
         # not every entry in the playlist is a song; some are e.g. air breaks
